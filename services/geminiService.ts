@@ -5,17 +5,6 @@ const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 const MODEL_NAME = "gemini-2.5-flash";
 
-const cleanJson = (text: string | undefined): string => {
-  if (!text) return "";
-  let clean = text.trim();
-  if (clean.startsWith("```json")) {
-    clean = clean.replace(/^```json/, "").replace(/```$/, "");
-  } else if (clean.startsWith("```")) {
-    clean = clean.replace(/^```/, "").replace(/```$/, "");
-  }
-  return clean;
-};
-
 export const extractSkills = async (bio: string): Promise<Skill[]> => {
   const prompt = `
     Analyse le texte suivant qui décrit le parcours et les expériences d'un candidat.
@@ -45,12 +34,7 @@ export const extractSkills = async (bio: string): Promise<Skill[]> => {
     }
   });
 
-  try {
-    return JSON.parse(cleanJson(response.text) || "[]");
-  } catch (error) {
-    console.error("Failed to parse skills JSON", error);
-    return [];
-  }
+  return JSON.parse(response.text || "[]");
 };
 
 export const suggestJobs = async (skills: Skill[]): Promise<JobOption[]> => {
@@ -91,12 +75,7 @@ export const suggestJobs = async (skills: Skill[]): Promise<JobOption[]> => {
     }
   });
 
-  try {
-    return JSON.parse(cleanJson(response.text) || "[]");
-  } catch (error) {
-    console.error("Failed to parse jobs JSON", error);
-    return [];
-  }
+  return JSON.parse(response.text || "[]");
 };
 
 export const generateApplicationKit = async (job: JobOption, skills: Skill[], userBio: string): Promise<ApplicationKit> => {
@@ -130,14 +109,5 @@ export const generateApplicationKit = async (job: JobOption, skills: Skill[], us
     }
   });
 
-  try {
-    return JSON.parse(cleanJson(response.text) || "{}");
-  } catch (error) {
-    console.error("Failed to parse kit JSON", error);
-    return {
-      cvSummary: "",
-      linkedinAbout: "",
-      coverLetter: ""
-    };
-  }
+  return JSON.parse(response.text || "{}");
 };
