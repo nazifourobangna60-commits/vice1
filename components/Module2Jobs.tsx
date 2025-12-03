@@ -1,7 +1,7 @@
 import React from 'react';
 import { useProject } from '../context/ProjectContext';
 import { suggestJobs } from '../services/geminiService';
-import { Compass, Loader2, ArrowRight, Target, CheckSquare } from 'lucide-react';
+import { Compass, Loader2, ArrowRight, Target, CheckSquare, AlertCircle } from 'lucide-react';
 
 const Module2Jobs: React.FC = () => {
   const { skills, jobOptions, setJobOptions, selectedJob, setSelectedJob, loading, setLoading, setCurrentStep } = useProject();
@@ -26,6 +26,34 @@ const Module2Jobs: React.FC = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  if (skills.length === 0) {
+    return (
+      <div className="space-y-8 animate-in fade-in duration-500">
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+          <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-2 mb-2">
+            <Compass className="text-purple-600" />
+            2. Exploration & Plan d'Action
+          </h2>
+        </div>
+        
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-8 text-center">
+          <AlertCircle className="h-12 w-12 text-amber-500 mx-auto mb-4" />
+          <h3 className="text-lg font-bold text-amber-900 mb-2">Compétences manquantes</h3>
+          <p className="text-amber-800 mb-6">
+            Pour explorer des pistes de métiers pertinentes, l'IA a besoin de connaître vos compétences.
+            Veuillez d'abord compléter l'étape 1.
+          </p>
+          <button
+            onClick={() => setCurrentStep(0)}
+            className="bg-amber-600 hover:bg-amber-700 text-white px-6 py-2.5 rounded-lg font-medium transition-colors"
+          >
+            Retourner à l'étape "Compétences"
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
