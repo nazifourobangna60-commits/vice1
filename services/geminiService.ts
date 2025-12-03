@@ -1,11 +1,21 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { Skill, JobOption, ApplicationKit, SkillType } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
 const MODEL_NAME = "gemini-2.5-flash";
 
+const cleanJson = (text: string | undefined): string => {
+  if (!text) return "";
+  let clean = text.trim();
+  if (clean.startsWith("```json")) {
+    clean = clean.replace(/^```json/, "").replace(/```$/, "");
+  } else if (clean.startsWith("```")) {
+    clean = clean.replace(/^```/, "").replace(/```$/, "");
+  }
+  return clean;
+};
+
 export const extractSkills = async (bio: string): Promise<Skill[]> => {
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   const prompt = `
     Analyse le texte suivant qui décrit le parcours et les expériences d'un candidat.
     Identifie exactement 10 compétences clés (mélange équilibré de savoir-faire techniques et de savoir-être).
@@ -34,10 +44,16 @@ export const extractSkills = async (bio: string): Promise<Skill[]> => {
     }
   });
 
-  return JSON.parse(response.text || "[]");
+  try {
+    return JSON.parse(cleanJson(response.text) || "[]");
+  } catch (error) {
+    console.error("Failed to parse skills JSON", error);
+    return [];
+  }
 };
 
 export const suggestJobs = async (skills: Skill[]): Promise<JobOption[]> => {
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   const skillsList = skills.map(s => `${s.name} (${s.type})`).join(", ");
   
   const prompt = `
@@ -75,10 +91,16 @@ export const suggestJobs = async (skills: Skill[]): Promise<JobOption[]> => {
     }
   });
 
-  return JSON.parse(response.text || "[]");
+  try {
+    return JSON.parse(cleanJson(response.text) || "[]");
+  } catch (error) {
+    console.error("Failed to parse jobs JSON", error);
+    return [];
+  }
 };
 
 export const generateApplicationKit = async (job: JobOption, skills: Skill[], userBio: string): Promise<ApplicationKit> => {
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   const skillsList = skills.map(s => s.name).join(", ");
   
   const prompt = `
@@ -109,5 +131,14 @@ export const generateApplicationKit = async (job: JobOption, skills: Skill[], us
     }
   });
 
-  return JSON.parse(response.text || "{}");
+  try {
+    return JSON.parse(cleanJson(response.text) || "{}");
+  } catch (error) {
+    console.error("Failed to parse kit JSON", error);
+    return {
+      cvSummary: "",
+      linkedinAbout: "",
+      coverLetter: ""
+    };
+  }
 };

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useProject } from '../context/ProjectContext';
-import { BrainCircuit, Compass, Briefcase, FileCheck, Info } from 'lucide-react';
+import { BrainCircuit, Compass, Briefcase, FileCheck } from 'lucide-react';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -50,15 +50,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             );
           })}
         </nav>
-
-        <div className="p-6 mt-auto">
-          <div className="bg-blue-50 p-4 rounded-lg text-xs text-blue-800 border border-blue-100">
-            <div className="flex items-center gap-2 font-bold mb-1">
-              <Info className="h-4 w-4" /> Info
-            </div>
-            Temps estimé total: 5h-6h. Prenez des pauses toutes les 45 min.
-          </div>
-        </div>
       </aside>
 
       {/* Main Content */}
